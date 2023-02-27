@@ -1,0 +1,18 @@
+h1{
+  color: #39004d;
+  text-align: center;
+  font-style: bold;
+  font-family: "Rockwell";
+  border-style: outset;
+  border-color: #600080;
+}
+h2{
+  color: #39004d;
+  text-align: center;
+  font-style: bold;
+  font-family: "Segoe UI";
+}
+.titulo{
+  border-style: solid;
+  border-width: 5px;
+}
