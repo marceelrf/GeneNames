@@ -3,12 +3,13 @@ library(org.Hs.eg.db)
 library(org.Mm.eg.db)
 library(org.Rn.eg.db)
 library(dplyr)
-
+library(BiocManager)
+options(repos = BiocManager::repositories())
 
 ui <- fluidPage(
   includeCSS(path = "style.css"),
   fluidRow(id = "titulo",
-    h1("Gene Names checker")
+    h1("Gene Names checker - Marshall's tools")
   ),
   fluidRow(
     column(width = 3,
