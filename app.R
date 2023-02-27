@@ -17,7 +17,7 @@ ui <- fluidPage(
            h2(("Enter with your genes symbols")),
            textAreaInput(inputId = "genesIn",label = "",
                      value = "",
-                     placeholder = "Enter your genes separated by tabs or spaces."),
+                     placeholder = "Enter your genes separated by spaces or enters."),
            hr(),
            h2("Choose the identifier of your genes"),
            selectInput(inputId = "indGene",label = "",
@@ -56,7 +56,7 @@ server <- function(input, output, session) {
     if(input$genesIn == ""){
       return(NULL)
     } else {
-      stringr::str_split_1(string = input$genesIn,pattern = "[:blank:]")
+      stringr::str_split_1(string = input$genesIn,pattern = "[:blank:]|\n")
     }
   })
 
