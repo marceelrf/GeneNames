@@ -31,8 +31,13 @@ ui <- fluidPage(
            )
          ),
     column(width = 8,offset = 1,
-           textOutput(outputId = "textOut"),
-           dataTableOutput(outputId = "finalTable")
+           tabsetPanel(
+             tabPanel("Main",
+                      textOutput(outputId = "textOut"),
+                      dataTableOutput(outputId = "finalTable")),
+             tabPanel("About",includeHTML(path = "about.html"))
+           )
+
            )
     )
 )

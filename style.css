@@ -14,5 +14,8 @@ h2{
 }
 body{
   background-color: #e6e6ff;
-
+}
+p{
+  font-family: "Segoe UI";
+  text-align:justify;
 }
