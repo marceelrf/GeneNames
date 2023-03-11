@@ -34,7 +34,11 @@ ui <- fluidPage(
            tabsetPanel(
              tabPanel("Main",
                       textOutput(outputId = "textOut"),
-                      dataTableOutput(outputId = "finalTable")),
+                      dataTableOutput(outputId = "finalTable"),
+                      hr(),
+                      h3("Download"),
+                      downloadButton('download',"Download your table")),
+             tabPanel("How to use",includeHTML(path = "howtouse.html")),
              tabPanel("About",includeHTML(path = "about.html"))
            )
 
@@ -86,6 +90,14 @@ server <- function(input, output, session) {
     Annot()
 
   })
+
+  output$download <- downloadHandler(
+    filename = function(){"TableOfYourGenes.csv"},
+    content = function(fname){
+      write.csv(Annot() %>% dplyr::select(-ALIAS)
+                , fname,row.names = F)
+    }
+  )
 }
 
 shinyApp(ui, server)
