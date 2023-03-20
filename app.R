@@ -94,7 +94,7 @@ server <- function(input, output, session) {
   output$download <- downloadHandler(
     filename = function(){"TableOfYourGenes.csv"},
     content = function(fname){
-      write.csv(Annot() %>% dplyr::select(-ALIAS)
+      write.csv(Annot() %>% dplyr::select(-ALIAS) %>% dplyr::distinct()
                 , fname,row.names = F)
     }
   )
