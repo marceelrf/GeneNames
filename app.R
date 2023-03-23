@@ -4,6 +4,9 @@ library(org.Mm.eg.db)
 library(org.Rn.eg.db)
 library(dplyr)
 library(BiocManager)
+library(tidyr)
+library(purrr)
+
 options(repos = BiocManager::repositories())
 
 ui <- fluidPage(
@@ -87,7 +90,13 @@ server <- function(input, output, session) {
   })
 
   output$finalTable <- renderDataTable({
-    Annot()
+    Annot() %>%
+      group_by(SYMBOL, ENTREZID,ENSEMBL) %>%
+      nest() %>%
+      mutate(ALIAS = map(data, ~paste(.x$ALIAS,collapse = ", "))) %>%
+      unnest(ALIAS) %>%
+      select(-data) %>%
+      ungroup()
 
   })
 
