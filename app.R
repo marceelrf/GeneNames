@@ -90,14 +90,19 @@ server <- function(input, output, session) {
   })
 
   output$finalTable <- renderDataTable({
-    Annot() %>%
-      group_by(SYMBOL, ENTREZID,ENSEMBL) %>%
-      nest() %>%
-      mutate(ALIAS = map(data, ~paste(.x$ALIAS,collapse = ", "))) %>%
-      unnest(ALIAS) %>%
-      select(-data) %>%
-      ungroup()
-
+    if ((input$genesIn) =="") {
+      tibble("SYMBOL","ENTREZID","ENSEMBL","ALIAS")
+    } else  if(is.null(Annot())) {
+      return(NULL)
+    } else {
+      Annot() %>%
+        group_by(SYMBOL, ENTREZID,ENSEMBL) %>%
+        nest() %>%
+        mutate(ALIAS = map(data, ~paste(.x$ALIAS,collapse = ", "))) %>%
+        unnest(ALIAS) %>%
+        select(-data) %>%
+        ungroup()
+      }
   })
 
   output$download <- downloadHandler(
