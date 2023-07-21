@@ -6,6 +6,7 @@ library(dplyr)
 library(BiocManager)
 library(tidyr)
 library(purrr)
+library(stringr)
 
 options(repos = BiocManager::repositories())
 
@@ -39,8 +40,11 @@ ui <- fluidPage(
                       textOutput(outputId = "textOut"),
                       dataTableOutput(outputId = "finalTable"),
                       hr(),
+                      uiOutput("genesNOT"),
                       h3("Download"),
                       downloadButton('download',"Download your table")),
+             tabPanel("Aliases",
+                      h1("Coming soon")),
              tabPanel("How to use",includeHTML(path = "howtouse.html")),
              tabPanel("About",includeHTML(path = "about.html"))
            )
@@ -68,7 +72,10 @@ server <- function(input, output, session) {
     if(input$genesIn == ""){
       return(NULL)
     } else {
-      stringr::str_split_1(string = input$genesIn,pattern = "[:blank:]|\n")
+      tibble(Genes = stringr::str_split_1(string = input$genesIn,
+                           pattern = "[:blank:]|\n|[:space:]")) %>%
+        filter(!is.na(Genes)) %>%
+        pull(Genes)
     }
   })
 
@@ -96,12 +103,15 @@ server <- function(input, output, session) {
       return(NULL)
     } else {
       Annot() %>%
+        dplyr::filter(str_detect(SYMBOL,pattern = regex("[:blank:]|\n|[:space:]"),
+                                 negate = T)) %>%
         group_by(SYMBOL, ENTREZID,ENSEMBL) %>%
         nest() %>%
         mutate(ALIAS = map(data, ~paste(.x$ALIAS,collapse = ", "))) %>%
         unnest(ALIAS) %>%
         select(-data) %>%
-        ungroup()
+        ungroup() %>%
+        dplyr::filter(!is.na(ALIAS))
       }
   })
 
@@ -112,6 +122,36 @@ server <- function(input, output, session) {
                 , fname,row.names = F)
     }
   )
+
+  ##Output of the Genes not matched
+  output$genesNOT <- renderUI({
+
+    if(input$genesIn == ""){
+      return(NULL)
+    } else {
+      textOutput(outputId = "textgenesNOT")
+
+      Annot_mod <- Annot() %>%
+        filter(!is.na(ALIAS))
+
+      n_out <- (length(unique(Genes())) - length(unique(Annot_mod$SYMBOL)[unique(Annot_mod$SYMBOL) %in% unique(Genes())]))
+
+      Notgenes <- str_subset(string = Genes(),
+                             pattern = paste0(Annot_mod$SYMBOL,
+                                              collapse = "|"),
+                             negate = T)
+
+
+      Notgenes <- paste0(Notgenes,collapse = "\n")
+
+      gtest <- paste0(Genes(),collapse = ", ")
+      output$textgenesNOT <- renderText({
+        glue::glue("Your gene list contains {n_out} unmapped gene.
+                   {Notgenes} of {gtest}")
+
+    })
+      }
+    })
 }
 
 shinyApp(ui, server)
